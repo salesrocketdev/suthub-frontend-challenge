@@ -242,7 +242,7 @@
                 v-model="registerUserForm.hasCar"
                 type="radio"
                 id="hasCarYes"
-                value="true"
+                :value="true"
                 class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
               />
               <label for="hasCarYes" class="ml-2 text-sm text-gray-900"
@@ -254,26 +254,31 @@
                 v-model="registerUserForm.hasCar"
                 type="radio"
                 id="hasCarNo"
-                value="false"
+                :value="false"
                 class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
               />
               <label for="hasCarNo" class="ml-2 text-sm text-gray-900"
-                >Não</label
-              >
+                >Não
+              </label>
             </div>
+            <a
+              role="button"
+              class="block text-sm text-indigo-600 hover:text-indigo-800"
+              @click="isModalOpen = true"
+            >
+              Por que precisamos desta informação?
+            </a>
           </div>
-          <a
-            role="button"
-            class="block text-sm text-indigo-600 hover:text-indigo-800 mt-2"
-            @click="isModalOpen = true"
-          >
-            Por que precisamos desta informação?
-          </a>
+          <p v-if="v$.hasCar.$error" class="text-red-600 text-xs">
+            <span class="font-normal text-xs">{{
+              v$.hasCar.$errors ? v$.hasCar.$errors[0]?.$message : undefined
+            }}</span>
+          </p>
         </fieldset>
       </div>
 
       <!-- Informações sobre o Pet -->
-      <div v-if="registerUserForm.petSpecies" class="space-y-6 mb-8">
+      <div class="space-y-6 mb-8">
         <h2 class="text-xl font-semibold text-gray-800">Informações do Pet</h2>
 
         <fieldset>
@@ -297,7 +302,7 @@
           </p>
         </fieldset>
 
-        <fieldset v-if="registerUserForm.petSpecies">
+        <fieldset>
           <label
             for="petBreed"
             class="block mb-2 text-sm font-medium text-gray-900"
@@ -419,11 +424,141 @@
         </div>
       </Dialog>
     </TransitionRoot>
+
+    <!-- Modal de Sucesso -->
+    <TransitionRoot as="template" :show="isModalSuccessOpen">
+      <Dialog
+        as="div"
+        class="fixed z-10 inset-0 overflow-y-auto"
+        @close="closeModal"
+      >
+        <div
+          class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+        >
+          <TransitionChild
+            as="template"
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <DialogOverlay
+              class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-[-1]"
+            />
+          </TransitionChild>
+
+          <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+            >&#8203;</span
+          >
+
+          <TransitionChild
+            as="template"
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            enterTo="opacity-100 translate-y-0 sm:scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          >
+            <div
+              class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+            >
+              <div class="flex items-center mb-4">
+                <CheckCircleIcon class="h-6 w-6 text-green-500" />
+
+                <DialogTitle
+                  as="h3"
+                  class="text-lg leading-6 font-medium text-gray-900"
+                >
+                  Sucesso! Dados cadastrados corretamente.
+                </DialogTitle>
+              </div>
+
+              <div class="space-y-4 text-sm text-gray-500">
+                <div class="flex justify-between">
+                  <span class="font-semibold">Nome Completo:</span>
+                  <span>{{ registerUserForm.fullName }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">CPF:</span>
+                  <span>{{ registerUserForm.cpf }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Data de Nascimento:</span>
+                  <span>{{ registerUserForm.birthDate }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Telefone:</span>
+                  <span>{{ registerUserForm.phone }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">CEP:</span>
+                  <span>{{ registerUserForm.zipCode }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Rua:</span>
+                  <span>{{ registerUserForm.street }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Bairro:</span>
+                  <span>{{ registerUserForm.neighborhood }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Cidade:</span>
+                  <span>{{ registerUserForm.city }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Estado:</span>
+                  <span>{{ registerUserForm.state }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Renda Mensal:</span>
+                  <span>{{ registerUserForm.monthlyIncome }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Possui Carro:</span>
+                  <span>{{ registerUserForm.hasCar ? "Sim" : "Não" }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Espécie do Pet:</span>
+                  <span>{{ registerUserForm.petSpecies }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-semibold">Raça do Pet:</span>
+                  <span>{{ registerUserForm.petBreed }}</span>
+                </div>
+                <div
+                  v-if="registerUserForm.petBreed === 'Outro'"
+                  class="flex justify-between"
+                >
+                  <span class="font-semibold">Nome da Raça do Pet:</span>
+                  <span>{{ registerUserForm.petOtherBreed }}</span>
+                </div>
+              </div>
+
+              <div class="mt-5 sm:mt-6">
+                <button
+                  type="button"
+                  class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700"
+                  @click="closeSuccessModal()"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </TransitionChild>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </div>
 </template>
 
 <script lang="ts">
 import { ref } from "vue";
+
+import { unformat } from "v-money3";
 
 import { currencyConfigs } from "@/shared/utils/currencyConfig";
 import { postalCodeMask, phoneMask, cpfMask } from "@/shared/mask/mask";
@@ -441,7 +576,7 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 
-import { ChevronUpIcon } from "@heroicons/vue/20/solid";
+import { CheckCircleIcon } from "@heroicons/vue/20/solid";
 
 import { PetSpecies } from "@/enums/PetSpecies";
 
@@ -456,7 +591,7 @@ export default defineComponent({
     DialogTitle,
     TransitionChild,
     TransitionRoot,
-    ChevronUpIcon,
+    CheckCircleIcon,
   },
   setup() {
     const { getAddressByPostalCode } = useAddress();
@@ -465,7 +600,9 @@ export default defineComponent({
     const selectedCurrencyConfig = ref(currencyConfigs.BRL);
 
     const petBreeds = ref<string[]>([]);
+
     const isModalOpen = ref(false);
+    const isModalSuccessOpen = ref(false);
 
     const fetchAddress = async () => {
       const address = await getAddressByPostalCode(
@@ -486,13 +623,27 @@ export default defineComponent({
       isModalOpen.value = false;
     };
 
+    const closeSuccessModal = () => {
+      isModalSuccessOpen.value = false;
+      navigateTo("/");
+    };
+
     const handleSubmit = async () => {
       try {
+        registerUserForm.value.monthlyIncome = unformat(
+          registerUserForm.value.monthlyIncome.toString(),
+          selectedCurrencyConfig.value
+        );
+
         const result = await v$.value.$validate();
 
         if (!result) return;
 
         const response = await registerUser(registerUserForm.value);
+
+        if (response) {
+          isModalSuccessOpen.value = true;
+        }
       } catch (e) {
         console.error(e);
       }
@@ -548,9 +699,11 @@ export default defineComponent({
       registerUserForm,
       petBreeds,
       isModalOpen,
+      isModalSuccessOpen,
       fetchAddress,
       openModal,
       closeModal,
+      closeSuccessModal,
       handleSubmit,
     };
   },

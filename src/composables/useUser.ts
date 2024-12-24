@@ -17,14 +17,19 @@ import type { UsersResponse } from "@/interfaces/responses/UsersResponse";
 import type { CreateUserRequest } from "@/interfaces/requests/createUserRequest";
 import type { ITablePaginationProps } from "@/interfaces/props/ITablePaginationProps";
 import type { ITableColumnProps } from "@/interfaces/props/ITableColumnProps";
-
-import { PetSpecies } from "@/enums/PetSpecies";
+import { validateCPF } from "@/shared/utils/documentUtils";
 
 export const useUser = () => {
-  // Máscaras e regras personalizadas
-  const validCPF = helpers.regex("cpf", /^\d{3}\.\d{3}\.\d{3}-\d{2}$/);
-  const validPhone = helpers.regex("phone", /^\(\d{2}\) \d{4,5}-\d{4}$/);
-  const validCEP = helpers.regex("cep", /^\d{5}-\d{3}$/);
+  // Função customizada para validar o valor mínimo
+  const minIncomeValidation = helpers.withMessage(
+    "A renda mensal deve ser pelo menos R$ 1000",
+    (value: string) => {
+      const formattedValue = parseFloat(
+        value.toString().replace("R$", "").replace(/\./g, "").replace(",", ".")
+      );
+      return !isNaN(formattedValue) && formattedValue >= 1000;
+    }
+  );
 
   const user = ref<User | null>(null);
   const users = ref<User[]>([]);
@@ -55,7 +60,9 @@ export const useUser = () => {
     },
     cpf: {
       required: helpers.withMessage("O CPF é obrigatório", required),
-      validCPF: helpers.withMessage("CPF inválido", validCPF),
+      cpfValid: helpers.withMessage("CPF inválido", (value: string) =>
+        validateCPF(value.toString().replace(".", "").replace("-", ""))
+      ),
     },
     birthDate: {
       required: helpers.withMessage(
@@ -74,11 +81,9 @@ export const useUser = () => {
     },
     phone: {
       required: helpers.withMessage("O telefone é obrigatório", required),
-      validPhone: helpers.withMessage("Telefone inválido", validPhone),
     },
     zipCode: {
       required: helpers.withMessage("O CEP é obrigatório", required),
-      validCEP: helpers.withMessage("CEP inválido", validCEP),
     },
     street: {
       required: helpers.withMessage("O endereço é obrigatório", required),
@@ -94,13 +99,9 @@ export const useUser = () => {
     },
     monthlyIncome: {
       required: helpers.withMessage("A renda mensal é obrigatória", required),
-      numeric: helpers.withMessage(
-        "A renda mensal deve ser um número",
-        numeric
-      ),
       minValue: helpers.withMessage(
         "A renda mensal deve ser pelo menos R$ 1000",
-        minValue(1000)
+        minIncomeValidation
       ),
     },
     hasCar: {
@@ -123,9 +124,8 @@ export const useUser = () => {
       required: helpers.withMessage("A raça do animal é obrigatória", required),
     },
     petOtherBreed: {
-      required: helpers.withMessage("A raça do animal é obrigatória", required),
-      requiredIf: helpers.withMessage(
-        "Informe a raça do animal se selecionou 'Outro'",
+      required: helpers.withMessage(
+        () => `A raça do animal é obrigatória`,
         requiredIf(
           () =>
             registerUserForm.value.petBreed === "Other" ||
@@ -138,16 +138,16 @@ export const useUser = () => {
   const registerUserForm = ref<CreateUserRequest>({
     fullName: "",
     cpf: "",
-    birthDate: new Date(),
+    birthDate: null,
     phone: "",
     zipCode: "",
     street: "",
     neighborhood: "",
     city: "",
     state: "",
-    monthlyIncome: 1000,
+    monthlyIncome: 0,
     hasCar: false,
-    petSpecies: PetSpecies.Cat,
+    petSpecies: null,
     petBreed: "",
     petOtherBreed: "",
   });
