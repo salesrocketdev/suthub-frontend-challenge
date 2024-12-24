@@ -17,7 +17,8 @@ import type { UsersResponse } from "@/interfaces/responses/UsersResponse";
 import type { CreateUserRequest } from "@/interfaces/requests/createUserRequest";
 import type { ITablePaginationProps } from "@/interfaces/props/ITablePaginationProps";
 import type { ITableColumnProps } from "@/interfaces/props/ITableColumnProps";
-import { validateCPF } from "@/shared/utils/documentUtils";
+
+import { validatePhone, validateCPF } from "@/shared/utils/documentUtils";
 
 export const useUser = () => {
   // Função customizada para validar o valor mínimo
@@ -81,6 +82,10 @@ export const useUser = () => {
     },
     phone: {
       required: helpers.withMessage("O telefone é obrigatório", required),
+      cellPhoneValid: helpers.withMessage(
+        "Número de celular inválido",
+        (value: string) => validatePhone(value)
+      ),
     },
     zipCode: {
       required: helpers.withMessage("O CEP é obrigatório", required),

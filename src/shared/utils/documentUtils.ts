@@ -28,3 +28,13 @@ export const validateCPF = function (cpf: string): boolean {
 
   return true;
 };
+
+export const validatePhone = (phone: string) => {
+  const cleanedPhone = phone.replace(/[^\d]/g, "");
+
+  const isValidLength = /^(\d{2})\d{9}$/.test(cleanedPhone);
+
+  const allDigitsEqual = /^(\d)\1{10}$/.test(cleanedPhone);
+
+  return isValidLength && !allDigitsEqual;
+};
